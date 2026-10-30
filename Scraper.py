@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import feedparser
 
@@ -15,7 +16,7 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 GigScraperFeed/1.0"
 }
 
 DB_HEADERS = {
@@ -36,8 +37,16 @@ def fetch_tasks():
         rss_url = f"https://www.reddit.com/r/{sub}/new.rss?limit=25"
         try:
             res = requests.get(rss_url, headers=HEADERS, timeout=10)
+            
+            # Retry if rate limited
+            if res.status_code == 429:
+                print(f"[RATE LIMITED] r/{sub} returned 429. Waiting 3s before retry...")
+                time.sleep(3)
+                res = requests.get(rss_url, headers=HEADERS, timeout=10)
+
             if res.status_code != 200:
                 print(f"[REDDIT ERROR] r/{sub} returned status code {res.status_code}")
+                time.sleep(3)
                 continue
 
             feed = feedparser.parse(res.text)
@@ -76,6 +85,9 @@ def fetch_tasks():
 
         except Exception as e:
             print(f"Fetch error for r/{sub}: {e}")
+
+        # Pause 3 seconds between subreddit requests to respect Reddit rate limits
+        time.sleep(3)
 
 if __name__ == "__main__":
     fetch_tasks()

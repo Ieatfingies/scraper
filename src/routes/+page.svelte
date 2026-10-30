@@ -37,20 +37,23 @@
 	}
 </script>
 
-<div class="app-container">
-	<main class="main-content">
+<div class="val-container">
+	<div class="grid-bg"></div>
+
+	<main class="main-wrapper">
 		<header class="header">
-			<div class="title-group">
-				<h1 class="title">GIG SCRAPER</h1>
-				<p class="subtitle">Live Reddit job feed</p>
+			<div class="title-section">
+				<h1 class="title">GIG <span class="accent">SCRAPER</span></h1>
 			</div>
 
-			<button on:click={fetchGigs} disabled={loading} class="btn-refresh">
-				{#if loading}
-					<span class="spinner"></span> Refreshing...
-				{:else}
-					Refresh Feed
-				{/if}
+			<button on:click={fetchGigs} disabled={loading} class="val-btn">
+				<span class="btn-text">
+					{#if loading}
+						<span class="spinner"></span> REFRESHING...
+					{:else}
+						⚡ REFRESH FEED
+					{/if}
+				</span>
 			</button>
 		</header>
 
@@ -62,7 +65,7 @@
 			</div>
 		{:else if gigs.length === 0}
 			<div class="empty-state">
-				<p>No gigs found yet.</p>
+				<p>NO GIGS DETECTED</p>
 			</div>
 		{:else}
 			<div class="card-list">
@@ -76,8 +79,8 @@
 							<h2 class="gig-title">{gig.title}</h2>
 						</div>
 
-						<a href={gig.link} target="_blank" rel="noopener noreferrer" class="btn-view">
-							View Task →
+						<a href={gig.link} target="_blank" rel="noopener noreferrer" class="view-btn">
+							VIEW TASK →
 						</a>
 					</div>
 				{/each}
@@ -90,71 +93,87 @@
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		background-color: #0b0f19;
-		color: #e2e8f0;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+		background-color: #0f1722;
+		color: #ece8e1;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	}
 
-	.app-container {
+	.val-container {
 		min-height: 100vh;
 		padding: 2.5rem 1rem;
+		position: relative;
 		box-sizing: border-box;
 	}
 
-	.main-content {
-		max-width: 900px;
+	.grid-bg {
+		position: fixed;
+		inset: 0;
+		background-size: 30px 30px;
+		background-image: 
+			linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+			linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+		pointer-events: none;
+	}
+
+	.main-wrapper {
+		max-width: 950px;
 		margin: 0 auto;
+		position: relative;
+		z-index: 10;
 	}
 
 	.header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid #1e293b;
-		padding-bottom: 1.5rem;
+		border-bottom: 2px solid #1f293d;
+		padding-bottom: 1.25rem;
 		margin-bottom: 2rem;
 	}
 
 	.title {
 		margin: 0;
-		font-size: 2rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
+		font-size: 2.25rem;
+		font-weight: 900;
+		letter-spacing: -0.02em;
 		color: #ffffff;
+		font-style: italic;
 	}
 
-	.subtitle {
-		margin: 0.25rem 0 0 0;
-		font-size: 0.875rem;
-		color: #94a3b8;
+	.accent {
+		color: #ff4655;
 	}
 
-	.btn-refresh {
+	.val-btn {
 		background-color: #ff4655;
 		color: #ffffff;
 		border: none;
-		padding: 0.65rem 1.25rem;
-		font-weight: 600;
-		font-size: 0.875rem;
-		border-radius: 6px;
+		padding: 0.75rem 1.5rem;
+		font-weight: 800;
+		font-size: 0.8rem;
+		letter-spacing: 0.05em;
 		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: background-color 0.15s ease, transform 0.1s ease;
+		clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+		transition: transform 0.1s ease, background-color 0.15s ease;
 	}
 
-	.btn-refresh:hover {
+	.val-btn:hover {
 		background-color: #e03e4d;
 	}
 
-	.btn-refresh:active {
-		transform: scale(0.97);
+	.val-btn:active {
+		transform: scale(0.96);
 	}
 
-	.btn-refresh:disabled {
-		opacity: 0.6;
+	.val-btn:disabled {
+		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	.btn-text {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.card-list {
@@ -164,16 +183,16 @@
 	}
 
 	.gig-card {
-		background-color: #131b2e;
-		border: 1px solid #1e293b;
-		border-radius: 8px;
+		background-color: #141e2d;
+		border: 1px solid #1f293d;
 		padding: 1.25rem 1.5rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		justify-content: space-between;
+		clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 		transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-		animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 		animation-delay: calc(var(--i) * 35ms);
 		opacity: 0;
 		transform: translateY(12px);
@@ -189,7 +208,7 @@
 	.gig-card:hover {
 		border-color: #ff4655;
 		transform: translateY(-2px);
-		box-shadow: 0 4px 20px rgba(255, 70, 85, 0.15);
+		box-shadow: 0 0 15px rgba(255, 70, 85, 0.2);
 	}
 
 	.meta-row {
@@ -200,48 +219,49 @@
 	}
 
 	.badge {
-		font-size: 0.75rem;
-		font-weight: 700;
-		padding: 0.25rem 0.6rem;
-		background-color: #1e293b;
+		font-size: 0.7rem;
+		font-weight: 800;
+		padding: 0.2rem 0.5rem;
+		background-color: #0f1722;
 		color: #ff4655;
-		border-radius: 4px;
+		border: 1px solid rgba(255, 70, 85, 0.3);
 	}
 
 	.time {
 		font-size: 0.75rem;
-		color: #64748b;
+		color: #7688a0;
 	}
 
 	.gig-title {
 		margin: 0;
 		font-size: 1.05rem;
-		font-weight: 600;
-		color: #f8fafc;
+		font-weight: 700;
+		color: #ffffff;
 		line-height: 1.4;
 	}
 
-	.btn-view {
+	.view-btn {
 		text-decoration: none;
-		padding: 0.55rem 1rem;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: #e2e8f0;
-		background-color: #1e293b;
-		border-radius: 6px;
-		border: 1px solid #334155;
+		padding: 0.6rem 1.1rem;
+		font-size: 0.75rem;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		color: #ece8e1;
+		background-color: #0f1722;
+		border: 1px solid #2a384f;
+		clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
 		transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 		white-space: nowrap;
 		align-self: flex-start;
 	}
 
 	@media (min-width: 640px) {
-		.btn-view {
+		.view-btn {
 			align-self: center;
 		}
 	}
 
-	.btn-view:hover {
+	.view-btn:hover {
 		background-color: #ff4655;
 		border-color: #ff4655;
 		color: #ffffff;
@@ -249,31 +269,29 @@
 
 	.skeleton-card {
 		height: 85px;
-		background-color: #1e293b;
-		border-radius: 8px;
-		opacity: 0.5;
+		background-color: #141e2d;
+		clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 		animation: pulse 1.5s infinite ease-in-out;
 	}
 
 	.empty-state {
 		text-align: center;
 		padding: 4rem 1rem;
-		border: 1px dashed #1e293b;
-		border-radius: 8px;
-		color: #64748b;
+		border: 1px dashed #1f293d;
+		color: #7688a0;
 	}
 
 	.spinner {
 		display: inline-block;
-		width: 14px;
-		height: 14px;
+		width: 12px;
+		height: 12px;
 		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-top-color: #ffffff;
 		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
 	}
 
-	@keyframes slideUp {
+	@keyframes slideIn {
 		to {
 			opacity: 1;
 			transform: translateY(0);

@@ -1,342 +1,171 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 
-	let gigs = [];
-	let searchQuery = '';
-	let selectedSubreddit = 'ALL';
-	let isLoading = false;
+	interface Gig {
+		id: string;
+		title: string;
+		link: string;
+		subreddit: string;
+		created: number;
+	}
 
-	async function loadGigs() {
-		isLoading = true;
+	let gigs: Gig[] = [];
+	let loading = true;
+
+	async function fetchGigs() {
+		loading = true;
 		try {
 			const res = await fetch('/api/gigs');
 			if (res.ok) {
 				gigs = await res.json();
 			}
 		} catch (e) {
-			console.error('Feed Sync Error:', e);
+			console.error(e);
 		} finally {
-			isLoading = false;
+			loading = false;
 		}
 	}
 
 	onMount(() => {
-		loadGigs();
+		fetchGigs();
 	});
 
-	$: filteredGigs = gigs.filter((gig) => {
-		const matchesSearch = gig.title?.toLowerCase().includes(searchQuery.toLowerCase());
-		const matchesSub =
-			selectedSubreddit === 'ALL' ||
-			gig.subreddit?.toLowerCase() === selectedSubreddit.toLowerCase();
-		return matchesSearch && matchesSub;
-	});
-
-	function formatTimestamp(utcSeconds) {
-		if (!utcSeconds) return '-';
-		const date = new Date(utcSeconds * 1000);
-		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' // ' + 
-			   date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+	function formatTime(timestamp: number) {
+		if (!timestamp) return 'JUST NOW';
+		const date = new Date(timestamp * 1000);
+		return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	}
 </script>
 
-<svelte:head>
-	<title>GIG DIRECTORY</title>
-	<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-</svelte:head>
+<div class="val-bg min-h-screen text-slate-100 font-mono p-4 md:p-8 selection:bg-[#ff4655] selection:text-white">
+	<!-- Background Tactical Grid -->
+	<div class="fixed inset-0 bg-grid opacity-20 pointer-events-none"></div>
 
-<div class="app-container">
-	<header class="top-nav">
-		<div class="brand">
-			<div class="accent-box"></div>
-			<h1>GIG DIRECTORY</h1>
-		</div>
-		<div class="record-count">
-			{filteredGigs.length} {filteredGigs.length === 1 ? 'MATCH' : 'MATCHES'}
-		</div>
-	</header>
-
-	<main class="content-wrapper">
-		<div class="controls-container">
-			<div class="input-group">
-				<input
-					type="text"
-					bind:value={searchQuery}
-					placeholder="Search listings..."
-					class="v-input"
-				/>
+	<main class="max-w-6xl mx-auto relative z-10">
+		<!-- Header Banner -->
+		<header class="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-slate-800 pb-6 mb-8 gap-4">
+			<div>
+				<div class="flex items-center gap-3 mb-1">
+					<span class="inline-block w-3 h-3 bg-[#ff4655] animate-ping rounded-full"></span>
+					<span class="text-xs uppercase tracking-widest text-[#ff4655] font-bold">// SYSTEM PROTOCOL ACTIVE</span>
+				</div>
+				<h1 class="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-white flex items-center gap-2">
+					REDDIT <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff4655] to-[#ff7373]">HUB</span>
+				</h1>
 			</div>
 
-			<div class="input-group">
-				<select bind:value={selectedSubreddit} class="v-select">
-					<option value="ALL">ALL SUBREDDITS</option>
-					<option value="slavelabour">r/slavelabour</option>
-					<option value="doneDirtCheap">r/doneDirtCheap</option>
-					<option value="forhire">r/forhire</option>
-				</select>
-			</div>
-
-			<button class="v-btn" on:click={loadGigs} disabled={isLoading}>
-				{isLoading ? 'SYNCING...' : 'REFRESH'}
-			</button>
-		</div>
-
-		<div class="table-wrapper">
-			<table class="v-table">
-				<thead>
-					<tr>
-						<th class="col-time">POSTED</th>
-						<th class="col-sub">SOURCE</th>
-						<th class="col-title">LISTING DETAILS</th>
-						<th class="col-action"></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#if filteredGigs.length === 0}
-						<tr class="empty-state">
-							<td colspan="4">
-								{#if isLoading}
-									LOADING DATA...
-								{:else}
-									NO LISTINGS MATCH YOUR CRITERIA
-								{/if}
-							</td>
-						</tr>
+			<!-- Tactically Styled Refresh Button -->
+			<button 
+				on:click={fetchGigs} 
+				disabled={loading}
+				class="val-btn relative group overflow-hidden bg-[#ff4655] text-white px-8 py-3 font-extrabold uppercase tracking-wider text-sm transition-all duration-200 active:scale-95 disabled:opacity-50"
+			>
+				<span class="relative z-10 flex items-center gap-2">
+					{#if loading}
+						<svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+						</svg>
+						REFRESHING...
 					{:else}
-						{#each filteredGigs as gig}
-							<tr>
-								<td class="col-time">{formatTimestamp(gig.created)}</td>
-								<td class="col-sub"><span class="badge">{gig.subreddit}</span></td>
-								<td class="col-title">{gig.title}</td>
-								<td class="col-action">
-									<a href={gig.link} target="_blank" rel="noreferrer" class="link-btn">VIEW</a>
-								</td>
-							</tr>
-						{/each}
+						⚡ REFRESH FEED
 					{/if}
-				</tbody>
-			</table>
-		</div>
+				</span>
+				<!-- Hover Sheen Effect -->
+				<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out"></div>
+			</button>
+		</header>
+
+		<!-- Feed Area -->
+		{#if loading && gigs.length === 0}
+			<div class="grid gap-4">
+				{#each Array(5) as _}
+					<div class="h-24 bg-slate-900/60 border border-slate-800 animate-pulse clip-corners"></div>
+				{/each}
+			</div>
+		{:else if gigs.length === 0}
+			<div class="text-center py-20 border border-dashed border-slate-800 rounded">
+				<p class="text-slate-500 tracking-widest uppercase">// NO TARGET GIGS DETECTED YET //</p>
+			</div>
+		{:else}
+			<div class="grid gap-4">
+				{#each gigs as gig, i (gig.id)}
+					<div 
+						style="--i: {i}"
+						class="val-card group relative bg-slate-900/80 border border-slate-800 hover:border-[#ff4655] p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(255,70,85,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
+					>
+						<!-- Left Side Details -->
+						<div class="space-y-2 max-w-3xl">
+							<div class="flex items-center gap-3">
+								<span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 text-[#ff4655] uppercase tracking-wider border border-[#ff4655]/30">
+									r/{gig.subreddit}
+								</span>
+								<span class="text-xs text-slate-500">
+									{formatTime(gig.created)}
+								</span>
+							</div>
+							<h2 class="text-lg font-bold text-slate-100 group-hover:text-white transition-colors leading-snug">
+								{gig.title}
+							</h2>
+						</div>
+
+						<!-- Action Cut-Corner Button -->
+						<a 
+							href={gig.link} 
+							target="_blank" 
+							rel="noopener noreferrer"
+							class="val-btn-outline group/btn relative inline-flex items-center justify-center px-6 py-2.5 text-xs font-black tracking-widest uppercase text-slate-200 border border-slate-700 group-hover:border-[#ff4655] group-hover:text-white transition-all overflow-hidden shrink-0"
+						>
+							<span class="relative z-10 flex items-center gap-2">
+								VIEW TASK
+								<span class="group-hover/btn:translate-x-1 transition-transform">→</span>
+							</span>
+							<div class="absolute inset-0 bg-[#ff4655] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-200 ease-out"></div>
+						</a>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</main>
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		padding: 0;
-		background-color: #0f1923;
-		color: #ece8e1;
-		font-family: 'Barlow', system-ui, -apple-system, sans-serif;
-		-webkit-font-smoothing: antialiased;
+	/* Dark Valorant-style background setup */
+	.val-bg {
+		background-color: #0f1722;
 	}
 
-	.app-container {
-		max-width: 1400px;
-		margin: 0 auto;
-		padding: 2rem;
+	.bg-grid {
+		background-size: 30px 30px;
+		background-image: 
+			linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+			linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 	}
 
-	.top-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-end;
-		border-bottom: 1px solid #282c31;
-		padding-bottom: 1rem;
-		margin-bottom: 2rem;
+	/* Tactical Cut Corner Polygon */
+	.val-btn, .val-card, .clip-corners {
+		clip-path: polygon(
+			12px 0, 
+			100% 0, 
+			100% calc(100% - 12px), 
+			calc(100% - 12px) 100%, 
+			0 100%, 
+			0 12px
+		);
 	}
 
-	.brand {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.accent-box {
-		width: 12px;
-		height: 12px;
-		background-color: #ff4655;
-	}
-
-	h1 {
-		margin: 0;
-		font-family: 'Oswald', sans-serif;
-		font-size: 2.5rem;
-		font-weight: 700;
-		letter-spacing: 2px;
-		line-height: 1;
-		color: #ece8e1;
-	}
-
-	.record-count {
-		font-family: 'Oswald', sans-serif;
-		font-size: 1.25rem;
-		color: #768079;
-		letter-spacing: 1px;
-	}
-
-	.controls-container {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.input-group {
-		flex: 1;
-		position: relative;
-	}
-
-	.v-input, .v-select {
-		width: 100%;
-		background-color: rgba(255, 255, 255, 0.05);
-		border: 1px solid #282c31;
-		color: #ece8e1;
-		padding: 0.75rem 1rem;
-		font-family: 'Barlow', sans-serif;
-		font-size: 1rem;
-		font-weight: 500;
-		outline: none;
-		transition: all 0.2s ease;
-		box-sizing: border-box;
-	}
-
-	.v-input:focus, .v-select:focus {
-		border-color: #ff4655;
-		background-color: rgba(255, 70, 85, 0.05);
-	}
-
-	.v-btn {
-		background-color: #ff4655;
-		color: #ece8e1;
-		border: 1px solid #ff4655;
-		padding: 0 2rem;
-		font-family: 'Oswald', sans-serif;
-		font-size: 1.1rem;
-		font-weight: 500;
-		letter-spacing: 1px;
-		cursor: pointer;
-		transition: all 0.15s ease;
-		min-width: 140px;
-	}
-
-	.v-btn:hover:not(:disabled) {
-		background-color: #ece8e1;
-		border-color: #ece8e1;
-		color: #0f1923;
-	}
-
-	.v-btn:disabled {
-		background-color: #282c31;
-		border-color: #282c31;
-		color: #768079;
-		cursor: not-allowed;
-	}
-
-	.table-wrapper {
-		background-color: rgba(255, 255, 255, 0.02);
-		border: 1px solid #282c31;
-	}
-
-	.v-table {
-		width: 100%;
-		border-collapse: collapse;
-		text-align: left;
-	}
-
-	.v-table th {
-		font-family: 'Oswald', sans-serif;
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: #768079;
-		letter-spacing: 1px;
-		padding: 1rem;
-		border-bottom: 1px solid #282c31;
-	}
-
-	.v-table td {
-		padding: 1rem;
-		border-bottom: 1px solid #1f2326;
-		transition: background-color 0.15s ease;
-	}
-
-	.v-table tbody tr {
-		position: relative;
-	}
-
-	.v-table tbody tr:hover td {
-		background-color: rgba(255, 255, 255, 0.04);
-	}
-
-	.v-table tbody tr::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 0;
-		bottom: 0;
-		width: 3px;
-		background-color: #ff4655;
+	/* Staggered Card Entrance Keyframe */
+	.val-card {
+		animation: valEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation-delay: calc(var(--i) * 40ms);
 		opacity: 0;
-		transition: opacity 0.15s ease;
+		transform: translateY(15px);
 	}
 
-	.v-table tbody tr:hover::before {
-		opacity: 1;
-	}
-
-	.col-time {
-		width: 160px;
-		color: #768079;
-		font-size: 0.9rem;
-	}
-
-	.col-sub {
-		width: 140px;
-	}
-
-	.badge {
-		display: inline-block;
-		background-color: #282c31;
-		color: #ece8e1;
-		padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.5px;
-		text-transform: uppercase;
-	}
-
-	.col-title {
-		font-weight: 500;
-		font-size: 1.05rem;
-	}
-
-	.col-action {
-		width: 100px;
-		text-align: right;
-	}
-
-	.link-btn {
-		display: inline-block;
-		color: #ff4655;
-		text-decoration: none;
-		font-family: 'Oswald', sans-serif;
-		font-size: 1rem;
-		font-weight: 500;
-		letter-spacing: 1px;
-		padding: 0.25rem 0.5rem;
-		border: 1px solid transparent;
-		transition: all 0.15s ease;
-	}
-
-	.link-btn:hover {
-		border-color: #ff4655;
-		background-color: rgba(255, 70, 85, 0.1);
-	}
-
-	.empty-state td {
-		text-align: center;
-		padding: 4rem 1rem !important;
-		color: #768079;
-		font-family: 'Oswald', sans-serif;
-		font-size: 1.25rem;
-		letter-spacing: 1px;
+	@keyframes valEnter {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>

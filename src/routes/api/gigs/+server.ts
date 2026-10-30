@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
-
-const SUPABASE_URL = 'https://lyofifkmhhlatybkqydl.supabase.co/rest/v1/gigs?select=*&order=created.desc&limit=100';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5b2ZpZmttaGhsYXR5YmtxeWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjY0ODksImV4cCI6MjEwODk0MjQ4OX0.Va99aGzwS-tyUHyD61iMED2FZfv0FRcm5SPUQlsGZ3c';
+import { SUPABASE_URL, SUPABASE_KEY } from '$env/static/private';
 
 export async function GET() {
 	try {
-		const res = await fetch(SUPABASE_URL, {
+		const endpoint = `${SUPABASE_URL}?select=*&order=created.desc&limit=100`;
+		const res = await fetch(endpoint, {
 			headers: {
 				'apikey': SUPABASE_KEY,
 				'Authorization': `Bearer ${SUPABASE_KEY}`

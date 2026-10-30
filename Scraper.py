@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 
@@ -5,8 +6,8 @@ SUBREDDITS = ["slavelabour", "doneDirtCheap", "forhire"]
 KEYWORDS = ["python", "script", "web", "html", "css", "js", "svelte", "bot", "scrape", "api", "bug", "fix", "data", "database"]
 HEADERS = {"User-Agent": "desktop:gig-scraper:v1.0 (by /u/your_username)"}
 
-SUPABASE_URL = "https://lyofifkmhhlatybkqydl.supabase.co/rest/v1/gigs"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5b2ZpZmttaGhsYXR5YmtxeWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjY0ODksImV4cCI6MjEwODk0MjQ4OX0.Va99aGzwS-tyUHyD61iMED2FZfv0FRcm5SPUQlsGZ3c"
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 DB_HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -60,4 +61,4 @@ def fetch_tasks():
             print(f"Fetch error: {e}")
 
 if __name__ == "__main__":
-        fetch_tasks()
+    fetch_tasks()

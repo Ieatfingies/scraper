@@ -37,90 +37,57 @@
 	}
 </script>
 
-<div class="val-bg min-h-screen text-slate-100 font-mono p-4 md:p-8 selection:bg-[#ff4655] selection:text-white">
-	<!-- Background Tactical Grid -->
-	<div class="fixed inset-0 bg-grid opacity-20 pointer-events-none"></div>
+<div class="val-app">
+	<div class="bg-grid"></div>
 
-	<main class="max-w-6xl mx-auto relative z-10">
-		<!-- Header Banner -->
-		<header class="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-slate-800 pb-6 mb-8 gap-4">
+	<main class="main-container">
+		<header class="header">
 			<div>
-				<div class="flex items-center gap-3 mb-1">
-					<span class="inline-block w-3 h-3 bg-[#ff4655] animate-ping rounded-full"></span>
-					<span class="text-xs uppercase tracking-widest text-[#ff4655] font-bold">// SYSTEM PROTOCOL ACTIVE</span>
+				<div class="system-status">
+					<span class="ping-dot"></span>
+					<span class="status-text">// SYSTEM PROTOCOL ACTIVE</span>
 				</div>
-				<h1 class="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-white flex items-center gap-2">
-					REDDIT <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff4655] to-[#ff7373]">HUB</span>
+				<h1 class="title">
+					REDDIT <span class="highlight">HUB</span>
 				</h1>
 			</div>
 
-			<!-- Tactically Styled Refresh Button -->
-			<button 
-				on:click={fetchGigs} 
-				disabled={loading}
-				class="val-btn relative group overflow-hidden bg-[#ff4655] text-white px-8 py-3 font-extrabold uppercase tracking-wider text-sm transition-all duration-200 active:scale-95 disabled:opacity-50"
-			>
-				<span class="relative z-10 flex items-center gap-2">
+			<button on:click={fetchGigs} disabled={loading} class="btn-primary">
+				<span class="btn-content">
 					{#if loading}
-						<svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-						</svg>
-						REFRESHING...
+						<span class="spinner"></span> REFRESHING...
 					{:else}
 						⚡ REFRESH FEED
 					{/if}
 				</span>
-				<!-- Hover Sheen Effect -->
-				<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-out"></div>
+				<div class="sheen"></div>
 			</button>
 		</header>
 
-		<!-- Feed Area -->
 		{#if loading && gigs.length === 0}
-			<div class="grid gap-4">
-				{#each Array(5) as _}
-					<div class="h-24 bg-slate-900/60 border border-slate-800 animate-pulse clip-corners"></div>
+			<div class="card-list">
+				{#each Array(4) as _}
+					<div class="skeleton-card"></div>
 				{/each}
 			</div>
 		{:else if gigs.length === 0}
-			<div class="text-center py-20 border border-dashed border-slate-800 rounded">
-				<p class="text-slate-500 tracking-widest uppercase">// NO TARGET GIGS DETECTED YET //</p>
+			<div class="empty-state">
+				<p>// NO TARGET GIGS DETECTED YET //</p>
 			</div>
 		{:else}
-			<div class="grid gap-4">
+			<div class="card-list">
 				{#each gigs as gig, i (gig.id)}
-					<div 
-						style="--i: {i}"
-						class="val-card group relative bg-slate-900/80 border border-slate-800 hover:border-[#ff4655] p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(255,70,85,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
-					>
-						<!-- Left Side Details -->
-						<div class="space-y-2 max-w-3xl">
-							<div class="flex items-center gap-3">
-								<span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 text-[#ff4655] uppercase tracking-wider border border-[#ff4655]/30">
-									r/{gig.subreddit}
-								</span>
-								<span class="text-xs text-slate-500">
-									{formatTime(gig.created)}
-								</span>
+					<div style="--i: {i}" class="gig-card">
+						<div class="gig-info">
+							<div class="meta-row">
+								<span class="badge">r/{gig.subreddit}</span>
+								<span class="time">{formatTime(gig.created)}</span>
 							</div>
-							<h2 class="text-lg font-bold text-slate-100 group-hover:text-white transition-colors leading-snug">
-								{gig.title}
-							</h2>
+							<h2 class="gig-title">{gig.title}</h2>
 						</div>
 
-						<!-- Action Cut-Corner Button -->
-						<a 
-							href={gig.link} 
-							target="_blank" 
-							rel="noopener noreferrer"
-							class="val-btn-outline group/btn relative inline-flex items-center justify-center px-6 py-2.5 text-xs font-black tracking-widest uppercase text-slate-200 border border-slate-700 group-hover:border-[#ff4655] group-hover:text-white transition-all overflow-hidden shrink-0"
-						>
-							<span class="relative z-10 flex items-center gap-2">
-								VIEW TASK
-								<span class="group-hover/btn:translate-x-1 transition-transform">→</span>
-							</span>
-							<div class="absolute inset-0 bg-[#ff4655] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-200 ease-out"></div>
+						<a href={gig.link} target="_blank" rel="noopener noreferrer" class="btn-action">
+							<span>VIEW TASK →</span>
 						</a>
 					</div>
 				{/each}
@@ -130,36 +97,253 @@
 </div>
 
 <style>
-	/* Dark Valorant-style background setup */
-	.val-bg {
+	:global(body) {
+		margin: 0;
+		padding: 0;
 		background-color: #0f1722;
+		color: #f1f5f9;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	}
+
+	.val-app {
+		min-height: 100vh;
+		position: relative;
+		padding: 2rem 1rem;
+		box-sizing: border-box;
 	}
 
 	.bg-grid {
-		background-size: 30px 30px;
+		position: fixed;
+		inset: 0;
+		background-size: 32px 32px;
 		background-image: 
-			linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-			linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+			linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+			linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+		pointer-events: none;
 	}
 
-	/* Tactical Cut Corner Polygon */
-	.val-btn, .val-card, .clip-corners {
-		clip-path: polygon(
-			12px 0, 
-			100% 0, 
-			100% calc(100% - 12px), 
-			calc(100% - 12px) 100%, 
-			0 100%, 
-			0 12px
-		);
+	.main-container {
+		max-width: 1100px;
+		margin: 0 auto;
+		position: relative;
+		z-index: 10;
 	}
 
-	/* Staggered Card Entrance Keyframe */
-	.val-card {
+	.header {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		justify-content: space-between;
+		align-items: flex-start;
+		border-bottom: 2px solid #1e293b;
+		padding-bottom: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+	@media (min-width: 768px) {
+		.header {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	.system-status {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.ping-dot {
+		width: 8px;
+		height: 8px;
+		background-color: #ff4655;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #ff4655;
+	}
+
+	.status-text {
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		color: #ff4655;
+	}
+
+	.title {
+		margin: 0;
+		font-size: 2.5rem;
+		font-weight: 900;
+		font-style: italic;
+		text-transform: uppercase;
+		color: #ffffff;
+		letter-spacing: -0.025em;
+	}
+
+	.highlight {
+		color: #ff4655;
+	}
+
+	.btn-primary {
+		position: relative;
+		overflow: hidden;
+		background-color: #ff4655;
+		color: #ffffff;
+		border: none;
+		padding: 0.85rem 2rem;
+		font-weight: 800;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		cursor: pointer;
+		transition: transform 0.15s ease, opacity 0.15s ease;
+		clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+	}
+
+	.btn-primary:active {
+		transform: scale(0.96);
+	}
+
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.btn-content {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.sheen {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+		transform: translateX(-100%);
+		transition: transform 0.5s ease;
+	}
+
+	.btn-primary:hover .sheen {
+		transform: translateX(100%);
+	}
+
+	.card-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.gig-card {
+		background-color: rgba(15, 23, 42, 0.85);
+		border: 1px solid #1e293b;
+		padding: 1.25rem 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		justify-content: space-between;
+		clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+		transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 		animation: valEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-		animation-delay: calc(var(--i) * 40ms);
+		animation-delay: calc(var(--i) * 45ms);
 		opacity: 0;
 		transform: translateY(15px);
+	}
+
+	@media (min-width: 768px) {
+		.gig-card {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	.gig-card:hover {
+		border-color: #ff4655;
+		transform: translateY(-2px);
+		box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+	}
+
+	.meta-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.badge {
+		font-size: 0.65rem;
+		font-weight: 800;
+		padding: 0.2rem 0.5rem;
+		background-color: #1e293b;
+		color: #ff4655;
+		text-transform: uppercase;
+		border: 1px solid rgba(255, 70, 85, 0.3);
+	}
+
+	.time {
+		font-size: 0.75rem;
+		color: #64748b;
+	}
+
+	.gig-title {
+		margin: 0;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #f8fafc;
+		line-height: 1.4;
+	}
+
+	.btn-action {
+		align-self: flex-start;
+		text-decoration: none;
+		padding: 0.65rem 1.25rem;
+		font-size: 0.75rem;
+		font-weight: 900;
+		letter-spacing: 0.1em;
+		color: #f1f5f9;
+		background-color: transparent;
+		border: 1px solid #334155;
+		clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+		transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+		white-space: nowrap;
+	}
+
+	@media (min-width: 768px) {
+		.btn-action {
+			align-self: center;
+		}
+	}
+
+	.btn-action:hover {
+		background-color: #ff4655;
+		border-color: #ff4655;
+		color: #ffffff;
+	}
+
+	.skeleton-card {
+		height: 90px;
+		background-color: #1e293b;
+		opacity: 0.5;
+		clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+		animation: pulse 1.5s infinite ease-in-out;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 1rem;
+		border: 1px dashed #1e293b;
+		color: #64748b;
+		letter-spacing: 0.1em;
+	}
+
+	.spinner {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		border: 2px solid rgba(255,255,255,0.3);
+		border-top-color: #ffffff;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes valEnter {
@@ -167,5 +351,14 @@
 			opacity: 1;
 			transform: translateY(0);
 		}
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 0.3; }
+		50% { opacity: 0.7; }
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
 	}
 </style>

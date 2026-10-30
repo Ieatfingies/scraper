@@ -60,6 +60,4 @@ def fetch_tasks():
             print(f"Fetch error: {e}")
 
 if __name__ == "__main__":
-    while True:
         fetch_tasks()
-        time.sleep(30)

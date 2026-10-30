@@ -25,6 +25,7 @@ jobs:
 
       - name: Run Scraper
         env:
+          PYTHONUNBUFFERED: "1"
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: python Scraper.py
+        run: python -u Scraper.py

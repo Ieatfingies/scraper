@@ -1,0 +1,6 @@
+{
+	"/": [],
+	"/api/gigs": [
+		"src/routes/api/gigs/+server.ts"
+	]
+}

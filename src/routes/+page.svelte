@@ -37,30 +37,20 @@
 	}
 </script>
 
-<div class="val-app">
-	<div class="bg-grid"></div>
-
-	<main class="main-container">
+<div class="app-container">
+	<main class="main-content">
 		<header class="header">
-			<div>
-				<div class="system-status">
-					<span class="ping-dot"></span>
-					<span class="status-text">// SYSTEM PROTOCOL ACTIVE</span>
-				</div>
-				<h1 class="title">
-					REDDIT <span class="highlight">HUB</span>
-				</h1>
+			<div class="title-group">
+				<h1 class="title">GIG SCRAPER</h1>
+				<p class="subtitle">Live Reddit job feed</p>
 			</div>
 
-			<button on:click={fetchGigs} disabled={loading} class="btn-primary">
-				<span class="btn-content">
-					{#if loading}
-						<span class="spinner"></span> REFRESHING...
-					{:else}
-						⚡ REFRESH FEED
-					{/if}
-				</span>
-				<div class="sheen"></div>
+			<button on:click={fetchGigs} disabled={loading} class="btn-refresh">
+				{#if loading}
+					<span class="spinner"></span> Refreshing...
+				{:else}
+					Refresh Feed
+				{/if}
 			</button>
 		</header>
 
@@ -72,7 +62,7 @@
 			</div>
 		{:else if gigs.length === 0}
 			<div class="empty-state">
-				<p>// NO TARGET GIGS DETECTED YET //</p>
+				<p>No gigs found yet.</p>
 			</div>
 		{:else}
 			<div class="card-list">
@@ -86,8 +76,8 @@
 							<h2 class="gig-title">{gig.title}</h2>
 						</div>
 
-						<a href={gig.link} target="_blank" rel="noopener noreferrer" class="btn-action">
-							<span>VIEW TASK →</span>
+						<a href={gig.link} target="_blank" rel="noopener noreferrer" class="btn-view">
+							View Task →
 						</a>
 					</div>
 				{/each}
@@ -100,132 +90,71 @@
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		background-color: #0f1722;
-		color: #f1f5f9;
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+		background-color: #0b0f19;
+		color: #e2e8f0;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	}
 
-	.val-app {
+	.app-container {
 		min-height: 100vh;
-		position: relative;
-		padding: 2rem 1rem;
+		padding: 2.5rem 1rem;
 		box-sizing: border-box;
 	}
 
-	.bg-grid {
-		position: fixed;
-		inset: 0;
-		background-size: 32px 32px;
-		background-image: 
-			linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-			linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-		pointer-events: none;
-	}
-
-	.main-container {
-		max-width: 1100px;
+	.main-content {
+		max-width: 900px;
 		margin: 0 auto;
-		position: relative;
-		z-index: 10;
 	}
 
 	.header {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 		justify-content: space-between;
-		align-items: flex-start;
-		border-bottom: 2px solid #1e293b;
+		align-items: center;
+		border-bottom: 1px solid #1e293b;
 		padding-bottom: 1.5rem;
 		margin-bottom: 2rem;
 	}
 
-	@media (min-width: 768px) {
-		.header {
-			flex-direction: row;
-			align-items: center;
-		}
-	}
-
-	.system-status {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.ping-dot {
-		width: 8px;
-		height: 8px;
-		background-color: #ff4655;
-		border-radius: 50%;
-		box-shadow: 0 0 8px #ff4655;
-	}
-
-	.status-text {
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		color: #ff4655;
-	}
-
 	.title {
 		margin: 0;
-		font-size: 2.5rem;
-		font-weight: 900;
-		font-style: italic;
-		text-transform: uppercase;
+		font-size: 2rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
 		color: #ffffff;
-		letter-spacing: -0.025em;
 	}
 
-	.highlight {
-		color: #ff4655;
+	.subtitle {
+		margin: 0.25rem 0 0 0;
+		font-size: 0.875rem;
+		color: #94a3b8;
 	}
 
-	.btn-primary {
-		position: relative;
-		overflow: hidden;
+	.btn-refresh {
 		background-color: #ff4655;
 		color: #ffffff;
 		border: none;
-		padding: 0.85rem 2rem;
-		font-weight: 800;
-		font-size: 0.85rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		padding: 0.65rem 1.25rem;
+		font-weight: 600;
+		font-size: 0.875rem;
+		border-radius: 6px;
 		cursor: pointer;
-		transition: transform 0.15s ease, opacity 0.15s ease;
-		clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-	}
-
-	.btn-primary:active {
-		transform: scale(0.96);
-	}
-
-	.btn-primary:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.btn-content {
-		position: relative;
-		z-index: 2;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		transition: background-color 0.15s ease, transform 0.1s ease;
 	}
 
-	.sheen {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-		transform: translateX(-100%);
-		transition: transform 0.5s ease;
+	.btn-refresh:hover {
+		background-color: #e03e4d;
 	}
 
-	.btn-primary:hover .sheen {
-		transform: translateX(100%);
+	.btn-refresh:active {
+		transform: scale(0.97);
+	}
+
+	.btn-refresh:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.card-list {
@@ -235,22 +164,22 @@
 	}
 
 	.gig-card {
-		background-color: rgba(15, 23, 42, 0.85);
+		background-color: #131b2e;
 		border: 1px solid #1e293b;
+		border-radius: 8px;
 		padding: 1.25rem 1.5rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		justify-content: space-between;
-		clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
 		transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-		animation: valEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-		animation-delay: calc(var(--i) * 45ms);
+		animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		animation-delay: calc(var(--i) * 35ms);
 		opacity: 0;
-		transform: translateY(15px);
+		transform: translateY(12px);
 	}
 
-	@media (min-width: 768px) {
+	@media (min-width: 640px) {
 		.gig-card {
 			flex-direction: row;
 			align-items: center;
@@ -260,7 +189,7 @@
 	.gig-card:hover {
 		border-color: #ff4655;
 		transform: translateY(-2px);
-		box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+		box-shadow: 0 4px 20px rgba(255, 70, 85, 0.15);
 	}
 
 	.meta-row {
@@ -271,13 +200,12 @@
 	}
 
 	.badge {
-		font-size: 0.65rem;
-		font-weight: 800;
-		padding: 0.2rem 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		padding: 0.25rem 0.6rem;
 		background-color: #1e293b;
 		color: #ff4655;
-		text-transform: uppercase;
-		border: 1px solid rgba(255, 70, 85, 0.3);
+		border-radius: 4px;
 	}
 
 	.time {
@@ -287,44 +215,43 @@
 
 	.gig-title {
 		margin: 0;
-		font-size: 1.1rem;
-		font-weight: 700;
+		font-size: 1.05rem;
+		font-weight: 600;
 		color: #f8fafc;
 		line-height: 1.4;
 	}
 
-	.btn-action {
-		align-self: flex-start;
+	.btn-view {
 		text-decoration: none;
-		padding: 0.65rem 1.25rem;
-		font-size: 0.75rem;
-		font-weight: 900;
-		letter-spacing: 0.1em;
-		color: #f1f5f9;
-		background-color: transparent;
+		padding: 0.55rem 1rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #e2e8f0;
+		background-color: #1e293b;
+		border-radius: 6px;
 		border: 1px solid #334155;
-		clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 		transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 		white-space: nowrap;
+		align-self: flex-start;
 	}
 
-	@media (min-width: 768px) {
-		.btn-action {
+	@media (min-width: 640px) {
+		.btn-view {
 			align-self: center;
 		}
 	}
 
-	.btn-action:hover {
+	.btn-view:hover {
 		background-color: #ff4655;
 		border-color: #ff4655;
 		color: #ffffff;
 	}
 
 	.skeleton-card {
-		height: 90px;
+		height: 85px;
 		background-color: #1e293b;
+		border-radius: 8px;
 		opacity: 0.5;
-		clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
 		animation: pulse 1.5s infinite ease-in-out;
 	}
 
@@ -332,21 +259,21 @@
 		text-align: center;
 		padding: 4rem 1rem;
 		border: 1px dashed #1e293b;
+		border-radius: 8px;
 		color: #64748b;
-		letter-spacing: 0.1em;
 	}
 
 	.spinner {
 		display: inline-block;
-		width: 12px;
-		height: 12px;
-		border: 2px solid rgba(255,255,255,0.3);
+		width: 14px;
+		height: 14px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-top-color: #ffffff;
 		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
 	}
 
-	@keyframes valEnter {
+	@keyframes slideUp {
 		to {
 			opacity: 1;
 			transform: translateY(0);

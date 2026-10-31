@@ -5,10 +5,12 @@ import feedparser
 
 COMBINED_FEED_URL = "https://www.reddit.com/r/slavelabour+doneDirtCheap+forhire/new.rss?limit=50"
 
+KEYWORDS = # Add broader tech keywords to catch more posts
 KEYWORDS = [
-    "python", "script", "web", "html", "css", "js", "svelte", "bot", 
-    "scrape", "api", "bug", "fix", "data", "database", "developer", 
-    "code", "coding", "automation", "backend", "frontend", "fullstack"
+    "python", "script", "web", "html", "css", "js", "javascript", "typescript",
+    "svelte", "react", "bot", "scrape", "scraper", "api", "bug", "fix", "data", 
+    "database", "developer", "code", "coding", "automation", "backend", 
+    "frontend", "fullstack", "excel", "sheets", "app", "site", "website", "program"
 ]
 
 BUYING_TAGS = ["[task]", "[hiring]", "hiring", "task", "buying", "[buying]", "need"]

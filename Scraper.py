@@ -9,20 +9,21 @@ KEYWORDS = [
     "python", "script", "web", "html", "css", "js", "javascript", "typescript",
     "svelte", "react", "bot", "scrape", "scraper", "api", "bug", "fix", "data", 
     "database", "developer", "code", "coding", "automation", "backend", 
-    "frontend", "fullstack", "excel", "sheets", "app", "site", "website", "program"
+    "frontend", "fullstack", "app", "site", "website", "program"
 ]
 
-BUYING_TAGS = ["[task]", "[hiring]", "hiring", "task", "buying", "[buying]", "need"]
+BUYING_TAGS = ["[task]", "[hiring]", "hiring", "[buying]", "buying"]
 
 SELLER_EXCLUSIONS = [
-    "[offer]", "[for hire]", "for hire", "willing to take", 
-    "need to earn", "looking for work", "available for"
+    "[offer]", "[for hire]", "for hire", "for-hire", "forhire", "[forhire]",
+    "hire me", "hiring me", "willing to", "need to earn", "need work", 
+    "looking for work", "available for", "offering", "services", "i will", 
+    "i can", "portfolio", "freelancer available", "for-hire"
 ]
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-# Unique User-Agent with timestamp to prevent Reddit edge caching
 HEADERS = {
     "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 GigScraperBot/{int(time.time())}"
 }
@@ -35,6 +36,19 @@ DB_HEADERS = {
 }
 
 seen_ids = set()
+
+def is_buyer_post(title: str) -> bool:
+    title_lower = title.lower()
+    
+    
+    if any(ex in title_lower for ex in SELLER_EXCLUSIONS):
+        return False
+        
+    
+    if any(tag in title_lower for tag in BUYING_TAGS):
+        return True
+        
+    return False
 
 def fetch_tasks():
     if not SUPABASE_URL or not SUPABASE_KEY:
@@ -62,7 +76,6 @@ def fetch_tasks():
             post_id = entry.get("id", "").split("/")[-1] or (link.split("/")[-2] if len(link.split("/")) > 2 else "")
             title = entry.get("title", "")
 
-            # Extract exact subreddit from post link (e.g. /r/slavelabour/...)
             sub = "slavelabour"
             if "/r/" in link:
                 sub = link.split("/r/")[1].split("/")[0]
@@ -71,10 +84,9 @@ def fetch_tasks():
                 continue
 
             title_lower = title.lower()
-            is_hiring_post = sub.lower() == "donedirtcheap" or any(tag in title_lower for tag in BUYING_TAGS)
-            is_offer_post = any(ex in title_lower for ex in SELLER_EXCLUSIONS)
 
-            if is_hiring_post and not is_offer_post:
+            
+            if is_buyer_post(title):
                 if any(kw in title_lower for kw in KEYWORDS):
                     seen_ids.add(post_id)
                     print(f"[MATCH FOUND] [{sub}] {title}")
